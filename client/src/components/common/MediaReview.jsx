@@ -83,9 +83,10 @@ const MediaReview = ({ reviews, media }) => {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight="bold" mb={2}>
-        Reviews
+      <Typography variant="h4" fontWeight="bold" mb={2} color="text.primary"> Reviews
       </Typography>
+
+
 
       {user && (
         <Stack spacing={2} mb={3}>

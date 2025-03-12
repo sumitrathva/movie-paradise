@@ -100,7 +100,7 @@ const ReviewList = () => {
 
   const dispatch = useDispatch();
 
-  const skip = 2;
+  const skip = 2; // Number of reviews to load per page
 
   useEffect(() => {
     const getReviews = async () => {
@@ -111,26 +111,32 @@ const ReviewList = () => {
       if (err) toast.error(err.message);
       if (response) {
         setCount(response.length);
-        setReviews([...response]);
-        setFilteredReviews([...response].splice(0, skip));
+        setReviews(response); // Store the complete list of reviews
+        setFilteredReviews(response.slice(0, skip)); // Initial set of reviews
       }
     };
 
     getReviews();
   }, []);
 
+  // Load more reviews by appending the next set based on the page
   const onLoadMore = () => {
-    setFilteredReviews([...filteredReviews, ...[...reviews].splice(page * skip, skip)]);
-    setPage(page + 1);
+    const nextReviews = reviews.slice(page * skip, (page + 1) * skip); // Get the next set of reviews
+    setFilteredReviews([...filteredReviews, ...nextReviews]); // Append the new reviews
+    setPage(page + 1); // Increment the page number
   };
 
+  // Remove a review and update the UI
   const onRemoved = (id) => {
-    console.log({ reviews });
-    const newReviews = [...reviews].filter(e => e.id !== id);
-    console.log({ newReviews });
+    const newReviews = reviews.filter((e) => e.id !== id); // Remove from full list
+    const newCount = newReviews.length; // Update the total count
+
+    // Update filtered reviews (keeping pagination intact)
+    const newFilteredReviews = newReviews.slice(0, page * skip);
+
     setReviews(newReviews);
-    setFilteredReviews([...newReviews].splice(0, page * skip));
-    setCount(count - 1);
+    setFilteredReviews(newFilteredReviews);
+    setCount(newCount);
   };
 
   return (
@@ -140,13 +146,11 @@ const ReviewList = () => {
           {filteredReviews.map((item) => (
             <Box key={item.id}>
               <ReviewItem review={item} onRemoved={onRemoved} />
-              <Divider sx={{
-                display: { xs: "block", md: "none" }
-              }} />
+              <Divider sx={{ display: { xs: "block", md: "none" } }} />
             </Box>
           ))}
           {filteredReviews.length < reviews.length && (
-            <Button onClick={onLoadMore}>load more</Button>
+            <Button onClick={onLoadMore}>Load more</Button>
           )}
         </Stack>
       </Container>

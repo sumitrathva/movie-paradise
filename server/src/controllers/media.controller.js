@@ -15,7 +15,7 @@ const getList = async (req, res) => {
     page = Number(page);
     if (!page || page < 1 || page > 500) page = 1;
 
-    console.log("📢 Fetching TMDB media list with:", { mediaType, mediaCategory, page });
+    // console.log("📢 Fetching TMDB media list with:", { mediaType, mediaCategory, page });
 
     const response = await tmdbApi.mediaList({ mediaType, mediaCategory, page });
 
@@ -24,7 +24,7 @@ const getList = async (req, res) => {
       return responseHandler.error(res, "TMDB API did not return data.");
     }
 
-    console.log("✅ Final TMDB Response:", response);
+   // console.log("✅ Final TMDB Response:", response);
 
     return responseHandler.ok(res, response);
   } catch (err) {
@@ -37,15 +37,15 @@ const getGenres = async (req, res) => {
   try {
     const { mediaType } = req.params;
 
-    console.log("📢 Fetching TMDB genres for:", mediaType);
+   // console.log("📢 Fetching TMDB genres for:", mediaType);
 
     const response = await tmdbApi.mediaGenres({ mediaType });
 
-    console.log("✅ Genres Response:", response);
+  //  console.log("✅ Genres Response:", response);
 
     return responseHandler.ok(res, response);
   } catch (err) {
-    console.error("❌ Error fetching genres:", err);
+    //console.error("❌ Error fetching genres:", err);
     responseHandler.error(res);
   }
 };
@@ -55,7 +55,7 @@ const search = async (req, res) => {
     const { mediaType } = req.params;
     const { query, page } = req.query;
 
-    console.log("📢 Searching TMDB with:", { query, page, mediaType });
+    //console.log("📢 Searching TMDB with:", { query, page, mediaType });
 
     const response = await tmdbApi.mediaSearch({
       query,
@@ -63,11 +63,11 @@ const search = async (req, res) => {
       mediaType: mediaType === "people" ? "person" : mediaType,
     });
 
-    console.log("✅ Search Results:", response);
+    //console.log("✅ Search Results:", response);
 
     responseHandler.ok(res, response);
   } catch (err) {
-    console.error("❌ Error in search:", err);
+    //console.error("❌ Error in search:", err);
     responseHandler.error(res);
   }
 };
@@ -76,13 +76,13 @@ const getDetail = async (req, res) => {
   try {
     const { mediaType, mediaId } = req.params;
 
-    console.log("📢 Fetching TMDB details for:", { mediaType, mediaId });
+   // console.log("📢 Fetching TMDB details for:", { mediaType, mediaId });
 
     const params = { mediaType, mediaId };
     const media = await tmdbApi.mediaDetail(params);
 
     if (!media) {
-      console.warn("⚠️ No media details found!");
+     // console.warn("⚠️ No media details found!");
       return responseHandler.notfound(res);
     }
 
@@ -104,10 +104,10 @@ const getDetail = async (req, res) => {
 
     media.reviews = await reviewModel.find({ mediaId }).populate("user").sort("-createdAt");
 
-    console.log("✅ Media Details Fetched Successfully");
+    //console.log("✅ Media Details Fetched Successfully");
     responseHandler.ok(res, media);
   } catch (err) {
-    console.error("❌ Error fetching media details:", err);
+   // console.error("❌ Error fetching media details:", err);
     responseHandler.error(res);
   }
 };

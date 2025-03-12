@@ -4,16 +4,16 @@ import responseHandler from "../handlers/response.handler.js";
 
 const signup = async (req, res) => {
   try {
+    console.log("🔍 Received Signup Data:", req.body); 
     const { username, password, displayName } = req.body;
 
     const checkUser = await userModel.findOne({ username });
 
-    if (checkUser) return responseHandler.badrequest(res, "username already used");
+    if (checkUser) return responseHandler.badrequest(res, "Username already used");
 
     const user = new userModel();
-
-    user.displayName = displayName;
     user.username = username;
+    user.displayName = displayName;
     user.setPassword(password);
 
     await user.save();
@@ -29,7 +29,8 @@ const signup = async (req, res) => {
       ...user._doc,
       id: user.id
     });
-  } catch {
+  } catch (error) {
+    console.error("❌ Signup Error:", error);
     responseHandler.error(res);
   }
 };
@@ -40,7 +41,7 @@ const signin = async (req, res) => {
 
     const user = await userModel.findOne({ username }).select("username password salt id displayName");
 
-    if (!user) return responseHandler.badrequest(res, "User not exist");
+    if (!user) return responseHandler.badrequest(res, "User does not exist");
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Wrong password");
 
@@ -58,7 +59,8 @@ const signin = async (req, res) => {
       ...user._doc,
       id: user.id
     });
-  } catch {
+  } catch (error) {
+    console.error("❌ Signin Error:", error);
     responseHandler.error(res);
   }
 };
@@ -67,30 +69,31 @@ const updatePassword = async (req, res) => {
   try {
     const { password, newPassword } = req.body;
 
-    const user = await userModel.findById(req.user.id).select("password id salt");
+    const user = await userModel.findById(req.user.id).select("password id salt displayName");
 
     if (!user) return responseHandler.unauthorize(res);
 
     if (!user.validPassword(password)) return responseHandler.badrequest(res, "Wrong password");
 
     user.setPassword(newPassword);
-
     await user.save();
 
     responseHandler.ok(res);
-  } catch {
+  } catch (error) {
+    console.error("❌ Update Password Error:", error);
     responseHandler.error(res);
   }
 };
 
 const getInfo = async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id);
+    const user = await userModel.findById(req.user.id).select("username displayName id");
 
     if (!user) return responseHandler.notfound(res);
 
     responseHandler.ok(res, user);
-  } catch {
+  } catch (error) {
+    console.error("❌ Get Info Error:", error);
     responseHandler.error(res);
   }
 };

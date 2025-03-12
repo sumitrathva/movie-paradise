@@ -11,86 +11,107 @@ import { setUser } from "../../redux/features/userSlice";
 
 const SignupForm = ({ switchAuthState }) => {
   const dispatch = useDispatch();
-
   const [isLoginRequest, setIsLoginRequest] = useState(false);
   const [errorMessage, setErrorMessage] = useState();
 
-  const signinForm = useFormik({
+  const signupForm = useFormik({
     initialValues: {
-      password: "",
+      displayName: "",  // ✅ Added displayName
       username: "",
-      displayName: "",
+      password: "",
       confirmPassword: ""
     },
     validationSchema: Yup.object({
-      username: Yup.string()
-        .min(8, "username minimum 8 characters")
-        .required("username is required"),
-      password: Yup.string()
-        .min(8, "password minimum 8 characters")
-        .required("password is required"),
       displayName: Yup.string()
-        .min(8, "displayName minimum 8 characters")
-        .required("displayName is required"),
+        .min(3, "Display Name must be at least 3 characters") // ✅ Validation for displayName
+        .required("Display Name is required"),
+      username: Yup.string()
+        .min(8, "Username must be at least 8 characters")
+        .required("Username is required"),
+      password: Yup.string()
+        .min(8, "Password must be at least 8 characters")
+        .required("Password is required"),
       confirmPassword: Yup.string()
-        .oneOf([Yup.ref("password")], "confirmPassword not match")
-        .min(8, "confirmPassword minimum 8 characters")
-        .required("confirmPassword is required")
+        .oneOf([Yup.ref("password")], "Passwords do not match")
+        .required("Confirm Password is required")
     }),
     onSubmit: async values => {
       setErrorMessage(undefined);
       setIsLoginRequest(true);
-      console.log("asdasdasdasd");
-      const { response, err } = await userApi.signup(values);
+    
+      const requestData = {
+        displayName: values.displayName, // ✅ Added displayName to request
+        username: values.username,
+        password: values.password,
+        confirmPassword: values.confirmPassword
+      };
+    
+      console.log("🟢 Signup Form Values:", values);
+      console.log("📤 Signup Request Data:", requestData);
+    
+      const { response, err } = await userApi.signup(requestData);
       setIsLoginRequest(false);
-
+    
       if (response) {
-        signinForm.resetForm();
+        signupForm.resetForm();
         dispatch(setUser(response));
         dispatch(setAuthModalOpen(false));
-        toast.success("Sign in success");
+        toast.success("Sign up successful!");
       }
-
+    
       if (err) setErrorMessage(err.message);
     }
   });
 
   return (
-    <Box component="form" onSubmit={signinForm.handleSubmit}>
+    <Box component="form" onSubmit={signupForm.handleSubmit}>
       <Stack spacing={3}>
         <TextField
           type="text"
-          placeholder="username"
+          placeholder="Display Name" // ✅ Added displayName field
+          name="displayName"
+          fullWidth
+          value={signupForm.values.displayName}
+          onChange={signupForm.handleChange}
+          color="success"
+          error={signupForm.touched.displayName && !!signupForm.errors.displayName}
+          helperText={signupForm.touched.displayName && signupForm.errors.displayName}
+        />
+
+        <TextField
+          type="text"
+          placeholder="Username"
           name="username"
           fullWidth
-          value={signinForm.values.username}
-          onChange={signinForm.handleChange}
+          value={signupForm.values.username}
+          onChange={signupForm.handleChange}
           color="success"
-          error={signinForm.touched.username && signinForm.errors.username !== undefined}
-          helperText={signinForm.touched.username && signinForm.errors.username}
+          error={signupForm.touched.username && !!signupForm.errors.username}
+          helperText={signupForm.touched.username && signupForm.errors.username}
         />
-       
+
         <TextField
           type="password"
-          placeholder="password"
+          placeholder="Password"
           name="password"
           fullWidth
-          value={signinForm.values.password}
-          onChange={signinForm.handleChange}
+          value={signupForm.values.password}
+          onChange={signupForm.handleChange}
           color="success"
-          error={signinForm.touched.password && signinForm.errors.password !== undefined}
-          helperText={signinForm.touched.password && signinForm.errors.password}
+          error={signupForm.touched.password && !!signupForm.errors.password}
+          helperText={signupForm.touched.password && signupForm.errors.password}
         />
+
         <TextField
           type="password"
-          placeholder="confirm password"
+          placeholder="Confirm Password"
           name="confirmPassword"
           fullWidth
-          value={signinForm.values.confirmPassword}
-          onChange={signinForm.handleChange}
+          value={signupForm.values.confirmPassword}
+          onChange={signupForm.handleChange}
           color="success"
-          error={signinForm.touched.confirmPassword && signinForm.errors.confirmPassword !== undefined}
-          helperText={signinForm.touched.confirmPassword && signinForm.errors.confirmPassword}
+          error={signupForm.touched.confirmPassword && !!signupForm.errors.confirmPassword}
+          helperText={signupForm.touched.confirmPassword && signupForm.errors.confirmPassword}
         />
       </Stack>
 
@@ -102,20 +123,20 @@ const SignupForm = ({ switchAuthState }) => {
         sx={{ marginTop: 4 }}
         loading={isLoginRequest}
       >
-        sign up
+        Sign Up
       </LoadingButton>
 
       <Button
         fullWidth
         sx={{ marginTop: 1 }}
-        onClick={() => switchAuthState()}
+        onClick={switchAuthState}
       >
-        sign in
+        Sign In
       </Button>
 
       {errorMessage && (
         <Box sx={{ marginTop: 2 }}>
-          <Alert severity="error" variant="outlined" >{errorMessage}</Alert>
+          <Alert severity="error" variant="outlined">{errorMessage}</Alert>
         </Box>
       )}
     </Box>

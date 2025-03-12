@@ -20,15 +20,19 @@ const userApi = {
       return { response };
     } catch (err) { console.log("err"); return { err }; }
   },
-  signup: async ({ username, password, confirmPassword, displayName }) => {
+  signup: async ({ username, displayName, password, confirmPassword }) => { // ✅ Added displayName
     try {
       const response = await publicClient.post(
         userEndpoints.signup,
-        { username, password, confirmPassword, displayName }
+        { username, displayName, password, confirmPassword } // ✅ Included displayName in request body
       );
-
+      
+      console.log("✅ Signup Success:", response.data);
       return { response };
-    } catch (err) { return { err }; }
+    } catch (err) {
+      console.log("❌ Signup Error:", err.response?.data || err.message);
+      return { err };
+    }
   },
   getInfo: async () => {
     try {

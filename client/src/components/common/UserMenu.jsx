@@ -8,7 +8,6 @@ import { setUser } from "../../redux/features/userSlice";
 
 const UserMenu = () => {
   const { user } = useSelector((state) => state.user);
-
   const dispatch = useDispatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -24,7 +23,7 @@ const UserMenu = () => {
             sx={{ cursor: "pointer", userSelect: "none" }}
             onClick={toggleMenu}
           >
-            {user.displayName}
+            {user?.username} {/* ✅ Updated from displayName to username */}
           </Typography>
           <Menu
             open={Boolean(anchorEl)}
@@ -47,7 +46,10 @@ const UserMenu = () => {
             ))}
             <ListItemButton
               sx={{ borderRadius: "10px" }}
-              onClick={() => dispatch(setUser(null))}
+              onClick={() => {
+                dispatch(setUser(null));
+                setAnchorEl(null); // Close menu after logout
+              }}
             >
               <ListItemIcon><LogoutOutlinedIcon /></ListItemIcon>
               <ListItemText disableTypography primary={

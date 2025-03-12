@@ -21,6 +21,12 @@ export const userSlice = createSlice({
       }
       state.user = action.payload;
     },
+    updateDisplayName: (state, action) => { // ✅ New action to update displayName
+      if (state.user) {
+        state.user.displayName = action.payload;
+        localStorage.setItem("user", JSON.stringify(state.user));
+      }
+    },
     setListFavorites: (state, action) => {
       state.listFavorites = action.payload;
     },
@@ -34,6 +40,6 @@ export const userSlice = createSlice({
   }
 });
 
-export const { setUser, setListFavorites, addFavorite, removeFavorite } = userSlice.actions;
+export const { setUser, updateDisplayName, setListFavorites, addFavorite, removeFavorite } = userSlice.actions;
 
 export default userSlice.reducer;

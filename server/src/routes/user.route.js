@@ -8,6 +8,7 @@ import tokenMiddleware from "../middlewares/token.middleware.js";
 
 const router = express.Router();
 
+// Signup Route (Added displayName back)
 router.post(
   "/signup",
   body("username")
@@ -17,6 +18,9 @@ router.post(
       const user = await userModel.findOne({ username: value });
       if (user) return Promise.reject("username already used");
     }),
+  body("displayName")
+    .exists().withMessage("displayName is required")
+    .isLength({ min: 3 }).withMessage("displayName minimum 3 characters"),
   body("password")
     .exists().withMessage("password is required")
     .isLength({ min: 8 }).withMessage("password minimum 8 characters"),
@@ -27,13 +31,11 @@ router.post(
       if (value !== req.body.password) throw new Error("confirmPassword not match");
       return true;
     }),
-  body("displayName")
-    .exists().withMessage("displayName is required")
-    .isLength({ min: 8 }).withMessage("displayName minimum 8 characters"),
   requestHandler.validate,
   userController.signup
 );
 
+// Signin Route
 router.post(
   "/signin",
   body("username")
@@ -46,6 +48,7 @@ router.post(
   userController.signin
 );
 
+// Update Password Route
 router.put(
   "/update-password",
   tokenMiddleware.auth,
@@ -66,18 +69,21 @@ router.put(
   userController.updatePassword
 );
 
+// Get User Info
 router.get(
   "/info",
   tokenMiddleware.auth,
   userController.getInfo
 );
 
+// Get Favorites
 router.get(
   "/favorites",
   tokenMiddleware.auth,
   favoriteController.getFavoritesOfUser
 );
 
+// Add Favorite
 router.post(
   "/favorites",
   tokenMiddleware.auth,
@@ -97,6 +103,7 @@ router.post(
   favoriteController.addFavorite
 );
 
+// Remove Favorite
 router.delete(
   "/favorites/:favoriteId",
   tokenMiddleware.auth,

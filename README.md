@@ -1,10 +1,10 @@
-# 🎬 **Movie Paradise** 🍿  
+# 🎬 Movie Paradise 🍿  
 
 Welcome to **Movie Paradise** – A platform where you can browse the latest movies, manage your favorites, and interact with fellow movie enthusiasts through comments. All movie data is sourced from the **TMDB API** to ensure up-to-date and accurate movie information! 🎥✨  
 
 ---
 
-## 🚀 **Features** 🚀  
+## 🚀 Features 🚀  
 
 - **🔐 User Authentication**: Secure sign-up, login, and session management.  
 - **🍿 Movie Browsing**: Search, filter, and sort movies to discover new films.  
@@ -15,7 +15,7 @@ Welcome to **Movie Paradise** – A platform where you can browse the latest mov
 
 ---
 
-## 📸 **Screenshots** 📸  
+## 📸 Screenshots 📸  
 
 ### 🌟 Light Mode  
 ![Home Page](./screenshots/homepage.png)  
@@ -41,12 +41,12 @@ Welcome to **Movie Paradise** – A platform where you can browse the latest mov
 ![Sign Up](./screenshots/signup.png)  
 *Create an account and start exploring movies!* 📝  
 
-![Update Password](./screenshots/update-password.png)  
+![Update Password](./screenshots/update_password.png)  
 *Easily update your password for security!* 🔒  
 
 ---
 
-## 🛠️ **Technologies Used** 🛠️  
+## 🛠️ Technologies Used 🛠️  
 
 ### **Frontend**  
 - React.js ⚛️  
@@ -74,82 +74,66 @@ Welcome to **Movie Paradise** – A platform where you can browse the latest mov
 
 ---
 
-## 🔍 **Features to Explore** 🔍  
-
-1. **🔐 User Authentication**  
-   - Register, log in, and manage your account securely.  
-
-2. **🍿 Browse Movies**  
-   - Search for movies by title, filter by genre, release date, or rating.  
-
-3. **❤️ Favorites Management**  
-   - Add/remove movies to/from your favorite list.  
-
-4. **💬 Commenting System**  
-   - Post, view, edit, and delete comments on movies.  
-
-5. **🌙 Dark Mode**  
-   - Toggle between light and dark themes.  
-
-6. **📱 Responsive Design**  
-   - Optimized for any device – desktop, tablet, or mobile!  
-
----
-
-## 🏁 **Getting Started** 🏁  
+## 🏁 Getting Started 🏁  
 
 ### 1️⃣ Clone the Repository  
 ```bash
 git clone https://github.com/your-username/movie-paradise.git
 cd movie-paradise
-2️⃣ Install Dependencies
-Frontend
-Navigate to the frontend folder and install dependencies:
+```
 
-bash
-Copy
-Edit
+### 2️⃣ Install Dependencies  
+
+#### **Frontend**  
+Navigate to the frontend folder and install dependencies:  
+```bash
 cd frontend
 npm install
-Backend
-Navigate to the backend folder and install dependencies:
+```
 
-bash
-Copy
-Edit
+#### **Backend**  
+Navigate to the backend folder and install dependencies:  
+```bash
 cd backend
 npm install
-3️⃣ Set Up Environment Variables
-Create a .env file in the backend folder with the following:
+```
 
-env
-Copy
-Edit
+### 3️⃣ Set Up Environment Variables  
+Create a `.env` file in the `backend` folder with the following:  
+```env
 TMDB_API_KEY=your_tmdb_api_key
 JWT_SECRET=your_jwt_secret_key
 MONGO_URI=your_mongo_database_url
-4️⃣ Start the Application
-Run the Backend
-bash
-Copy
-Edit
+```
+
+### 4️⃣ Start the Application  
+
+#### **Run the Backend**  
+```bash
 cd backend
 npm start
-Run the Frontend
-bash
-Copy
-Edit
+```
+
+#### **Run the Frontend**  
+```bash
 cd frontend
 npm start
-Visit http://localhost:3000 to view the application! 🎉
+```
 
-🙏 Acknowledgements 🙏
-TMDB API 🎥 for providing excellent movie data.
-React.js ⚛️ for building a dynamic frontend.
-Node.js & Express.js 🚀 for backend infrastructure.
-MongoDB 🗄️ for the database.
-🧑‍💻 Support 🧑‍💻
-Have questions? Feel free to open an issue or reach out directly! 📩
-We’re here to help and improve together!
+Visit **[http://localhost:3000](http://localhost:3000)** to view the application! 🎉  
 
-🍿 Happy Movie Watching! 🎬
+---
+
+## 🙏 Acknowledgements 🙏  
+- **TMDB API** 🎥 for providing excellent movie data.  
+- **React.js** ⚛️ for building a dynamic frontend.  
+- **Node.js & Express.js** 🚀 for backend infrastructure.  
+- **MongoDB** 🗄️ for the database.  
+
+---
+
+## 🧑‍💻 Support 🧑‍💻  
+Have questions? Feel free to open an issue or reach out directly! 📩  
+We’re here to help and improve together!  
+
+🍿 **Happy Movie Watching!** 🎬  

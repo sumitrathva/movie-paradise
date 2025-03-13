@@ -56,7 +56,7 @@ const ReviewItem = ({ review, onRemoved }) => {
       }}>
         <Stack spacing={1}>
           <Link
-            to={routesGen.mediaDetail(review.mediaType, review.mediaid)}
+            to={routesGen.mediaDetail(review.mediaType, review.mediaizd)}
             style={{ color: "unset", textDecoration: "none" }}
           >
             <Typography

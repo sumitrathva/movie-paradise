@@ -12,17 +12,24 @@ import TextAvatar from "./TextAvatar";
 
 const ReviewItem = ({ review, onRemoved }) => {
   const { user } = useSelector((state) => state.user);
-
   const [onRequest, setOnRequest] = useState(false);
 
   const onRemove = async () => {
     if (onRequest) return;
     setOnRequest(true);
 
-    const { response, err } = await reviewApi.remove({ reviewId: review.id });
+    const { response, err } = await reviewApi.remove({ reviewId: review.id || review._id });
 
-    if (err) toast.error(err.message);
-    if (response) onRemoved(review.id);
+    if (err) {
+      toast.error(err.message);
+      setOnRequest(false);
+    }
+
+    if (response) {
+      onRemoved(review.id);
+      toast.success("Review removed successfully");
+      setOnRequest(false);
+    }
   };
 
   return (
@@ -34,9 +41,7 @@ const ReviewItem = ({ review, onRemoved }) => {
       "&:hover": { backgroundColor: "background.paper" }
     }}>
       <Stack direction="row" spacing={2}>
-        {/* avatar */}
         <TextAvatar text={review.user?.displayName} />
-        {/* avatar */}
         <Stack spacing={2} flexGrow={1}>
           <Stack spacing={1}>
             <Typography variant="h6" fontWeight="700">
@@ -85,7 +90,7 @@ const MediaReview = ({ reviews, media, mediaType }) => {
 
   useEffect(() => {
     setListReviews([...reviews]);
-    setFilteredReviews([...reviews].splice(0, skip));
+    setFilteredReviews([...reviews].slice(0, skip));
     setReviewCount(reviews.length);
   }, [reviews]);
 
@@ -93,97 +98,131 @@ const MediaReview = ({ reviews, media, mediaType }) => {
     if (onRequest) return;
     setOnRequest(true);
 
+    if (!media.id) {
+      toast.error("Movie ID is required.");
+      setOnRequest(false);
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("Review content cannot be empty.");
+      setOnRequest(false);
+      return;
+    }
+
     const body = {
       content,
-      mediaId: media.id,
+      mediaId: String(media.id || media.mediaId),
       mediaType,
       mediaTitle: media.title || media.name,
       mediaPoster: media.poster_path
     };
 
     const { response, err } = await reviewApi.add(body);
-
     setOnRequest(false);
 
-    if (err) toast.error(err.message);
-    if (response) {
-      toast.success("Post review success");
+    if (err) {
+      toast.error(err.message);
+      return;
+    }
 
-      setFilteredReviews([...filteredReviews, response]);
-      setReviewCount(reviewCount + 1);
+    if (response) {
+      toast.success("Review posted successfully");
+
+      // ✅ Ensure React detects the state update
+      setListReviews((prevReviews) => {
+        const updatedReviews = [response, ...prevReviews];
+        return [...updatedReviews];
+      });
+
+      setFilteredReviews((prevReviews) => {
+        const updatedFiltered = [response, ...prevReviews].slice(0, page * skip);
+        return [...updatedFiltered];
+      });
+
+      setReviewCount((prevCount) => prevCount + 1);
       setContent("");
     }
   };
 
-  const onLoadMore = () => {
-    setFilteredReviews([...filteredReviews, ...[...listReviews].splice(page * skip, skip)]);
-    setPage(page + 1);
-  };
-
   const onRemoved = (id) => {
-    if (listReviews.findIndex(e => e.id === id) !== -1) {
-      const newListReviews = [...listReviews].filter(e => e.id !== id);
-      setListReviews(newListReviews);
-      setFilteredReviews([...newListReviews].splice(0, page * skip));
-    } else {
-      setFilteredReviews([...filteredReviews].filter(e => e.id !== id));
-    }
+    setListReviews((prevReviews) => {
+      const updatedReviews = prevReviews.filter((review) => review.id !== id);
+      return [...updatedReviews];
+    });
 
-    setReviewCount(reviewCount - 1);
+    setFilteredReviews((prevReviews) => {
+      const updatedFiltered = prevReviews.filter((review) => review.id !== id).slice(0, page * skip);
+      return [...updatedFiltered];
+    });
 
-    toast.success("Remove review success");
+    setReviewCount((prevCount) => prevCount - 1);
+    toast.success("Review removed successfully");
   };
+
+  const onLoadMore = () => {
+    setFilteredReviews((prevFiltered) => {
+      const moreReviews = listReviews.slice(page * skip, (page + 1) * skip);
+      return [...prevFiltered, ...moreReviews];
+    });
+    setPage((prevPage) => prevPage + 1);
+  };
+
+  // ✅ Debugging: Log state updates
+  useEffect(() => {
+    console.log("Updated Reviews List:", listReviews);
+    console.log("Filtered Reviews:", filteredReviews);
+  }, [listReviews, filteredReviews]);
 
   return (
-    <>
-      <Container header={`Reviews (${reviewCount})`}>
-        <Stack spacing={4} marginBottom={2}>
-          {filteredReviews.map((item) => (
-            item.user ? <Box key={item.id}>
+    <Container header={`Reviews (${reviewCount})`}>
+      <Stack spacing={4} marginBottom={2}>
+        {filteredReviews.map((item) => (
+          item.user ? (
+            <Box key={item.id}>
               <ReviewItem review={item} onRemoved={onRemoved} />
-              <Divider sx={{
-                display: { xs: "block", md: "none" }
-              }} />
-            </Box> : null
-          ))}
-          {filteredReviews.length < listReviews.length && (
-            <Button onClick={onLoadMore}>load more</Button>
-          )}
-        </Stack>
-        {user && (
-          <>
-            <Divider />
-            <Stack direction="row" spacing={2}>
-              <TextAvatar text={user.displayName} />
-              <Stack spacing={2} flexGrow={1}>
-                <Typography variant="h6" fontWeight="700">
-                  {user.displayName}
-                </Typography>
-                <TextField
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  multiline
-                  rows={4}
-                  placeholder="Write your review"
-                  variant="outlined"
-                />
-                <LoadingButton
-                  variant="contained"
-                  size="large"
-                  sx={{ width: "max-content" }}
-                  startIcon={<SendOutlinedIcon />}
-                  loadingPosition="start"
-                  loading={onRequest}
-                  onClick={onAddReview}
-                >
-                  post
-                </LoadingButton>
-              </Stack>
-            </Stack>
-          </>
+              <Divider sx={{ display: { xs: "block", md: "none" } }} />
+            </Box>
+          ) : null
+        ))}
+        {filteredReviews.length < listReviews.length && (
+          <Button onClick={onLoadMore}>Load more</Button>
         )}
-      </Container>
-    </>
+      </Stack>
+
+      {user && (
+        <>
+          <Divider />
+          <Stack direction="row" spacing={2}>
+            <TextAvatar text={user.displayName} />
+            <Stack spacing={2} flexGrow={1}>
+              <Typography variant="h6" fontWeight="700">
+                {user.displayName}
+              </Typography>
+              <TextField
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                multiline
+                rows={4}
+                placeholder="Write your review"
+                variant="outlined"
+              />
+              <LoadingButton
+                variant="contained"
+                size="large"
+                sx={{ width: "max-content" }}
+                startIcon={<SendOutlinedIcon />}
+                loadingPosition="start"
+                loading={onRequest}
+                onClick={onAddReview}
+              >
+                Post
+              </LoadingButton>
+            </Stack>
+          </Stack>
+        </>
+      )}
+    </Container>
   );
 };
 

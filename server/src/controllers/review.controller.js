@@ -13,8 +13,6 @@ const create = async (req, res) => {
       return responseHandler.unauthorized(res, "User authentication required.");
     }
 
-    console.log("Creating review for Movie ID:", movieId, "by User:", req.user.id);
-
     const review = new reviewModel({
       user: req.user.id,
       movieId,
@@ -42,8 +40,6 @@ const remove = async (req, res) => {
       return responseHandler.badrequest(res, "Review ID is required.");
     }
 
-    console.log("Deleting review with ID:", reviewId, "by User:", req.user.id);
-
     const review = await reviewModel.findOne({
       _id: reviewId,
       user: req.user.id
@@ -66,8 +62,6 @@ const getReviewsOfUser = async (req, res) => {
     if (!req.user || !req.user.id) {
       return responseHandler.unauthorized(res, "User authentication required.");
     }
-
-    console.log("Fetching reviews for User:", req.user.id);
 
     const reviews = await reviewModel.find({
       user: req.user.id

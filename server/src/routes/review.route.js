@@ -15,6 +15,10 @@ router.get(
 router.post(
   "/",
   tokenMiddleware.auth,
+  (req, res, next) => {
+    console.log("🔥 Received POST /api/v1/review with body:", req.body);
+    next();
+  },
   body("mediaId")
     .exists().withMessage("mediaId is required")
     .isLength({ min: 1 }).withMessage("mediaId can not be empty"),
@@ -31,6 +35,7 @@ router.post(
   requestHandler.validate,
   reviewController.create
 );
+
 
 router.delete(
   "/:reviewId",

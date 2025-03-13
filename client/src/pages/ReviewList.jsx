@@ -56,7 +56,7 @@ const ReviewItem = ({ review, onRemoved }) => {
       }}>
         <Stack spacing={1}>
           <Link
-            to={routesGen.mediaDetail(review.mediaType, review.mediaizd)}
+            to={routesGen.mediaDetail(review.mediaType, review.mediaid)}
             style={{ color: "unset", textDecoration: "none" }}
           >
             <Typography
@@ -100,7 +100,7 @@ const ReviewList = () => {
 
   const dispatch = useDispatch();
 
-  const skip = 2; // Number of reviews to load per page
+  const skip = 2;
 
   useEffect(() => {
     const getReviews = async () => {
@@ -111,32 +111,26 @@ const ReviewList = () => {
       if (err) toast.error(err.message);
       if (response) {
         setCount(response.length);
-        setReviews(response); // Store the complete list of reviews
-        setFilteredReviews(response.slice(0, skip)); // Initial set of reviews
+        setReviews([...response]);
+        setFilteredReviews([...response].splice(0, skip));
       }
     };
 
     getReviews();
   }, []);
 
-  // Load more reviews by appending the next set based on the page
   const onLoadMore = () => {
-    const nextReviews = reviews.slice(page * skip, (page + 1) * skip); // Get the next set of reviews
-    setFilteredReviews([...filteredReviews, ...nextReviews]); // Append the new reviews
-    setPage(page + 1); // Increment the page number
+    setFilteredReviews([...filteredReviews, ...[...reviews].splice(page * skip, skip)]);
+    setPage(page + 1);
   };
 
-  // Remove a review and update the UI
   const onRemoved = (id) => {
-    const newReviews = reviews.filter((e) => e.id !== id); // Remove from full list
-    const newCount = newReviews.length; // Update the total count
-
-    // Update filtered reviews (keeping pagination intact)
-    const newFilteredReviews = newReviews.slice(0, page * skip);
-
+    console.log({ reviews });
+    const newReviews = [...reviews].filter(e => e.id !== id);
+    console.log({ newReviews });
     setReviews(newReviews);
-    setFilteredReviews(newFilteredReviews);
-    setCount(newCount);
+    setFilteredReviews([...newReviews].splice(0, page * skip));
+    setCount(count - 1);
   };
 
   return (
@@ -146,11 +140,13 @@ const ReviewList = () => {
           {filteredReviews.map((item) => (
             <Box key={item.id}>
               <ReviewItem review={item} onRemoved={onRemoved} />
-              <Divider sx={{ display: { xs: "block", md: "none" } }} />
+              <Divider sx={{
+                display: { xs: "block", md: "none" }
+              }} />
             </Box>
           ))}
           {filteredReviews.length < reviews.length && (
-            <Button onClick={onLoadMore}>Load more</Button>
+            <Button onClick={onLoadMore}>load more</Button>
           )}
         </Stack>
       </Container>
